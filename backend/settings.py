@@ -5,22 +5,28 @@ Django 4.0.
 
 from pathlib import Path
 import os
+import environ
 
 #  Project BASE_DIR
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 STATIC_DIR=os.path.join(BASE_DIR,'static')
 
+env =environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-!=is9&v7h@gsp0kgcs3r7ga3t8(8hc3aexgc#h+!g&cbt0yad5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG =env("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS =env.list("ALLOWED_HOSTS", default=())
 
+env = environ.Env(
+    # set casting, default value
+    DATABASE_URL=(str, 'sqlite:///db.sqlite3') # Example of setting a default within django-environ
+)
 
 # Application definition
 
@@ -67,12 +73,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default':env.db_url()
 }
 
+
+# print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
